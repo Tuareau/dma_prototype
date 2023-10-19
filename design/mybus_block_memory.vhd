@@ -9,7 +9,7 @@ entity mybus_block_memory is
         
         -- MYBUS SLAVE INTERFACE
         mybus_s_address: in std_logic_vector(19 downto 0);
-        mybus_s_data: inout std_logic_vector(63 downto 0);
+        mybus_s_data: in std_logic_vector(63 downto 0);
         mybus_s_write: in std_logic;
         mybus_s_ready: out std_logic
     );
@@ -26,7 +26,6 @@ begin
                 mem(to_integer(unsigned(mybus_s_address))) <= mybus_s_data;
             else 
                 mybus_s_ready <= '1';
-                mybus_s_data <= mem(to_integer(unsigned(mybus_s_address)));
             end if;
         end if;
     end process;

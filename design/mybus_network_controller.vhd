@@ -20,8 +20,8 @@ entity mybus_network_controller is
 end;
 
 architecture synchronous of mybus_network_controller is
-    signal traffic_data: std_logic_vector(31 downto 0) := X"0000";
-    signal traffic_bytes: std_logic_vector(31 downto 0) := X"0000";
+    signal traffic_data: std_logic_vector(31 downto 0) := X"0000_0000";
+    signal traffic_bytes: std_logic_vector(31 downto 0) := X"0000_0000";
     signal traffic_process: std_logic := '0';
 begin
     process(clk) begin
@@ -30,13 +30,13 @@ begin
             -- init traffic generation start     
             if (send_packet_command = '1') then                
                 traffic_bytes <= packet_size;
-                traffic_data <= X"0000";
+                traffic_data <= X"0000_0000";
                 traffic_process <= '1';
             end if;
             
             -- send traffic to master stream
             if (traffic_process = '1' and mybus_m_stream_ready = '1') then
-                if (traffic_bytes /= X"0000") then
+                if (traffic_bytes /= X"0000_0000") then
                     mybus_m_stream_data <= traffic_data;
                     mybus_m_stream_valid <= '1';
                     if unsigned(traffic_bytes) < 4 then
@@ -48,7 +48,7 @@ begin
                     traffic_data <= std_logic_vector(unsigned(traffic_data) + 1);
                     traffic_bytes <= std_logic_vector(unsigned(traffic_bytes) - 4);                    
                 else 
-                    mybus_m_stream_data <= X"0000";
+                    mybus_m_stream_data <= X"0000_0000";
                     mybus_m_stream_flags <= B"0000";
                     mybus_m_stream_valid <= '0';
                     

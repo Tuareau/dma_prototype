@@ -15,7 +15,7 @@ entity mybus_direct_memory_access is
         
         -- MYBUS MASTER INTERFACE
         mybus_m_address: out STD_LOGIC_VECTOR(19 downto 0);
-        mybus_m_data: inout STD_LOGIC_VECTOR(63 downto 0);
+        mybus_m_data: out STD_LOGIC_VECTOR(63 downto 0);
         mybus_m_write: out STD_LOGIC;
         mybus_m_ready: in STD_LOGIC;
         
@@ -66,10 +66,10 @@ begin
             -- MYBUS DMA LOGIC
             case dma_state is              
                 when IDLE =>                     
-                    rx_packet_len <= X"0000_0000";
-                    rx_packet_num <= X"0000_0000";
+                    rx_packet_len <= (others => '0');
+                    rx_packet_num <= (others => '0');
                     
-                    word_buffer <= X"0000_0000";
+                    word_buffer <= (others => '0');
                     eop_flag <= '0';
                     
                     mem_overflow_intr <= '0';
@@ -114,7 +114,7 @@ begin
                     
                 when WR_BUF =>   
                       if (mybus_m_ready = '1') then
-                          mybus_m_address <= registers_map(6);
+                          mybus_m_address <= registers_map(6)(19 downto 0);
                           registers_map(6) <= std_logic_vector(unsigned(registers_map(6)) + 1);  
                           mybus_m_data <= word_buffer;   
                           mybus_m_write <= '1';       
@@ -133,9 +133,9 @@ begin
                  
                  when WR_DESC =>   
                       if (mybus_m_ready = '1') then
-                          mybus_m_address <= registers_map(2);
+                          mybus_m_address <= registers_map(2)(19 downto 0);
                           registers_map(2) <= std_logic_vector(unsigned(registers_map(6)) + 1);  
-                          mybus_m_data(62 downto 0) <= rx_packet_len;
+                          mybus_m_data(62 downto 0) <= rx_packet_len(62 downto 0);
                           if unsigned(rx_packet_len) = unsigned(registers_map(7)) then
                               mybus_m_data(63) <= '0';  -- EOP 
                           else 

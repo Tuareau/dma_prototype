@@ -55,19 +55,22 @@ begin
         SND_PKT_CMD => snd_pkt_cmd
     );    
     
-    process begin
-        clk <= not clk after 5ns;    
-    end process;
+    clk_gen: process begin
+        clk <= '0';
+        wait for 5ns;
+        clk <= '1';
+        wait for 5ns;    
+    end process clk_gen;
     
-    process begin
+    sim: process begin
         wait for 20ns;
         -- INIT PACKET TRAFFIC PARAMETERS
-        pkt_size <= std_logic_vector(to_unsigned(3, pkt_size'length));
+        pkt_size <= std_logic_vector(to_unsigned(32, pkt_size'length)); -- 32 bytes
         snd_pkt_cmd <= '0';
         wait for 10ns;
         -- SET DMA REGISTERS
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0000"; -- BD_BASE_ADDR
+        mybus_m_lite_address <= B"0_0000"; -- BD_BASE_ADDR
         mybus_m_lite_data_in <= X"0000_0000"; -- is 0x0000
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -75,7 +78,7 @@ begin
         wait for 10ns;
         
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0001"; -- BD_SIZE
+        mybus_m_lite_address <= B"0_0001"; -- BD_SIZE
         mybus_m_lite_data_in <= X"0000_0200"; -- is 512 64-bit words
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -83,7 +86,7 @@ begin
         wait for 10ns;
 
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0002"; -- BD_CURR_ADDR
+        mybus_m_lite_address <= B"0_0010"; -- BD_CURR_ADDR
         mybus_m_lite_data_in <= X"0000_0000"; -- is 0x0000
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -91,7 +94,7 @@ begin
         wait for 10ns;        
  
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0003"; -- BD_FLAGS
+        mybus_m_lite_address <= B"0_0011"; -- BD_FLAGS
         mybus_m_lite_data_in <= X"F0F0_F0F0"; -- is 0xF0F0...
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -99,7 +102,7 @@ begin
         wait for 10ns;  
         
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0004"; -- MEM_BASE_ADDR
+        mybus_m_lite_address <= B"0_0100"; -- MEM_BASE_ADDR
         mybus_m_lite_data_in <= X"0000_1000"; -- is 0x0000_1000
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -107,7 +110,7 @@ begin
         wait for 10ns;  
         
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0005"; -- MEM_SIZE
+        mybus_m_lite_address <= B"0_0101"; -- MEM_SIZE
         mybus_m_lite_data_in <= X"0000_4000"; -- is 16384 64-bit words
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -115,7 +118,7 @@ begin
         wait for 10ns;  
         
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0006"; -- MEM_CURR_ADDR
+        mybus_m_lite_address <= B"0_0110"; -- MEM_CURR_ADDR
         mybus_m_lite_data_in <= X"0000_1000"; -- is 0x0000_1000
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -123,7 +126,7 @@ begin
         wait for 10ns;     
         
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0007"; -- PKT_LEN
+        mybus_m_lite_address <= B"0_0111"; -- PKT_LEN
         mybus_m_lite_data_in <= X"0000_0020"; -- is 4 * 8 = 32 bytes
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -131,7 +134,7 @@ begin
         wait for 10ns;                
         
         wait until clk = '1';
-        mybus_m_lite_address <= X"0000_0008"; -- PKT_NUM
+        mybus_m_lite_address <= B"0_1000"; -- PKT_NUM
         mybus_m_lite_data_in <= X"0000_0003"; -- is 3 packets
         mybus_m_lite_write <= '1';
         wait for 5ns;
@@ -165,6 +168,6 @@ begin
         -- END SIMULATION
         wait;         
           
-    end process;    
+    end process sim;    
 
 end sim;
